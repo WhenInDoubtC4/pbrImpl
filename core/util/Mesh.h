@@ -8,7 +8,12 @@
 * Created by Adam Gyenes
 */
 
+#ifdef EMSCRIPTEN
+#include <GLFW/emscripten_glfw3.h>
+#include <GLES3/gl3.h>
+#else
 #include "../ew/external/glad.h"
+#endif
 
 namespace Util
 {

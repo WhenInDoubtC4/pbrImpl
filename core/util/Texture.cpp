@@ -20,7 +20,8 @@ GLuint Util::loadTexture(const char* filepath, GLint wrapMode, GLint filtering, 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	GLenum format = COMPONENTS_TO_FORMAT.at(numComponents);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	GLenum internalFormat = COMPONENTS_TO_INTERNAL_FORMAT.at(numComponents);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);

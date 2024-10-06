@@ -5,7 +5,13 @@
 #include <string>
 #include <iostream>
 
+#ifdef EMSCRIPTEN
+#include <GLFW/emscripten_glfw3.h>
+#include <GLES3/gl3.h>
+#else
 #include "../ew/external/glad.h"
+#endif
+
 #include "../ew/ewMath/mat4.h"
 #include <GLFW/glfw3.h>
 

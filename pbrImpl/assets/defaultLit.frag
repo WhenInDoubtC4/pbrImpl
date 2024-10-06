@@ -1,10 +1,6 @@
-/* 
-* Modified by Adam Gyenes
-* Fork of assignment7
-*/
+#version 300 es
 
-
-#version 450
+precision highp float;
 
 #define MAX_LIGHTS 4
 
@@ -22,15 +18,12 @@ struct Material
 	float shininess;
 };
 
-in Surface
-{
-	vec3 position;
-	vec3 normal;
-	vec3 tangent;
-	vec3 bitangent;
-	vec2 UV;
-	mat3 tbn;
-} fs_in;
+in vec3 atrPosition;
+in vec3 atrNormal;
+in vec3 atrTangent;
+in vec3 atrBitangent;
+in vec2 atrUV;
+in mat3 atrTbn;
 
 uniform vec3 _cameraPosition;
 uniform sampler2D _colorTexture;
@@ -112,22 +105,22 @@ vec2 ParallaxOcclusionMapping(vec2 UV, vec3 viewDir)
 
 void main()
 {
-	vec3 camera = normalize(_cameraPosition - fs_in.position); //v
+	vec3 camera = normalize(_cameraPosition - atrPosition); //v
 
 	vec3 ambient = _ambientColor * _material.ambientK;
 	vec3 light = ambient;
 
-	//vec3 tangentLightPos = fs_in.tbn * _lights[0].position;
-	vec3 tangentViewPos = fs_in.tbn * _cameraPosition;
-	vec3 tangentFragPos = fs_in.tbn * fs_in.position;
+	//vec3 tangentLightPos = atrTbn * _lights[0].position;
+	vec3 tangentViewPos = atrTbn * _cameraPosition;
+	vec3 tangentFragPos = atrTbn * atrPosition;
 	vec3 viewDir = normalize(tangentViewPos - tangentFragPos);
 
 	//Parallax method
 	vec2 finalUV;
-	if (_parallaxMethod == 0) finalUV = fs_in.UV;
-	else if (_parallaxMethod == 1) finalUV = SimpleParallaxMapping(fs_in.UV, viewDir);
-	else if (_parallaxMethod == 2) finalUV = SteepParallaxMapping(fs_in.UV, viewDir);
-	else finalUV = ParallaxOcclusionMapping(fs_in.UV, viewDir);
+	if (_parallaxMethod == 0) finalUV = atrUV;
+	else if (_parallaxMethod == 1) finalUV = SimpleParallaxMapping(atrUV, viewDir);
+	else if (_parallaxMethod == 2) finalUV = SteepParallaxMapping(atrUV, viewDir);
+	else finalUV = ParallaxOcclusionMapping(atrUV, viewDir);
 
 	//Discard out of bound frags
 	if(_discardOutOfBoundFrags == 1 && (finalUV.x > 1.0 || finalUV.y > 1.0 || finalUV.x < 0.0 || finalUV.y < 0.0)) discard;
@@ -135,13 +128,13 @@ void main()
 	//Lighting
 	for (int i = 0; i < _activeLights; i++)
 	{
-		vec3 lightDirection = normalize(_lights[i].position - fs_in.position); //omega
-		//vec3 reflected = reflect(-lightDirection, normalize(fs_in.normal)); //r
+		vec3 lightDirection = normalize(_lights[i].position - atrPosition); //omega
+		//vec3 reflected = reflect(-lightDirection, normalize(atrNormal)); //r
 		vec3 halfVec = normalize(lightDirection + camera); //h
 
 		//Blinn-phong
-		vec3 diffuse = _lights[i].color * _material.diffuseK * max(dot(normalize(fs_in.normal), lightDirection), 0.0);
-		vec3 specular = _lights[i].color * _material.specularK * pow(max(dot(halfVec, normalize(fs_in.normal)), 0.0), _material.shininess);
+		vec3 diffuse = _lights[i].color * _material.diffuseK * max(dot(normalize(atrNormal), lightDirection), 0.0);
+		vec3 specular = _lights[i].color * _material.specularK * pow(max(dot(halfVec, normalize(atrNormal)), 0.0), _material.shininess);
 
 		light += diffuse;
 		light += specular;
@@ -152,5 +145,5 @@ void main()
 
 	FragColor = texColor;
 
-	//FragColor = vec4(fs_in.tangent, 0.0);
+	//FragColor = vec4(atrTangent, 0.0);
 }
