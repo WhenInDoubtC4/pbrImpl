@@ -141,9 +141,9 @@ void main()
 	}
 
 	vec4 texColor = texture(_colorTexture, finalUV);
-	texColor *= vec4(light, 0.0);
+	texColor *= vec4(light, 1.0);
 
-	FragColor = texColor;
+	FragColor = vec4(texColor.rgb, 1.0);
 
 	//FragColor = vec4(atrTangent, 0.0);
 }

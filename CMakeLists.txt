@@ -17,8 +17,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(EMSCRIPTEN TURE)
     set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
     set(CMAKE_TOOLCHAIN_FILE "${EMSCRIPTEN_ROOT_PATH}/cmake/Modules/Platform/Emscripten.cmake")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Oz -s WASM=2 -s USE_SDL=0 -s ASYNCIFY -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s USE_GLFW=3")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -s WASM=2 -s USE_SDL=0 -s ASYNCIFY -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s USE_GLFW=3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Oz -s USE_SDL=0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -s USE_SDL=0")
     file(GLOB HTML "${CMAKE_CURRENT_SOURCE_DIR}/html/*")
     file(COPY ${HTML} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
 
@@ -36,6 +36,7 @@ include(external/cpm.cmake)
 # add libraries
 include(external/glfw.cmake)
 include(external/imgui.cmake)
+include(external/assimp.cmake)
 
 add_subdirectory(core)
 add_subdirectory(pbrImpl)

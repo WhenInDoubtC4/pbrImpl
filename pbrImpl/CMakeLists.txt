@@ -23,7 +23,9 @@ else()
 endif()
 
 if (EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMIN_WEBGL_VERSION=2 -sNO_DISABLE_EXCEPTION_CATCHING -s ASSERTIONS=1 -s SAFE_HEAP=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s ALLOW_MEMORY_GROWTH")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMIN_WEBGL_VERSION=2 -sNO_DISABLE_EXCEPTION_CATCHING -s ASSERTIONS=1 -s SAFE_HEAP=1 --use-port=contrib.glfw3 --shell-file ${CMAKE_CURRENT_LIST_DIR}/shell.html")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}\
 	--preload-file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../assets/bamboo_color.jpg\
 	--preload-file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../assets/bamboo_height.jpg\
@@ -48,7 +50,7 @@ if(EMSCRIPTEN)
     set_target_properties(pbrImpl PROPERTIES LINK_FLAGS "-s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1")
 endif()
 
-target_link_libraries(pbrImpl PUBLIC core IMGUI)
+target_link_libraries(pbrImpl PUBLIC glfw3 core IMGUI assimp)
 target_include_directories(pbrImpl PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 
 #Trigger asset copy when final is built

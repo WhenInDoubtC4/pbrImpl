@@ -10,6 +10,7 @@
 #include <GLFW/emscripten_glfw3.h>
 #include <GLES3/gl3.h>
 #include <emscripten/html5.h>
+#include <emscripten.h>
 #else
 #include <ew/external/glad.h>
 #endif
@@ -324,11 +325,29 @@ int main() {
 		return 1;
 	}
 
-	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Final project TEMPLATE", NULL, NULL);
+	double devicePixelRatio = 1;
+
+#ifdef EMSCRIPTEN
+	// setting the association window <-> canvas
+	emscripten_glfw_set_next_window_canvas_selector("#canvas");
+	devicePixelRatio = emscripten_get_device_pixel_ratio();
+#endif
+
+	//Truly beautiful
+	window = glfwCreateWindow(SCREEN_WIDTH * devicePixelRatio, SCREEN_HEIGHT * devicePixelRatio, "TEMPLATE", NULL, NULL);
+
 	if (window == NULL) {
 		printf("GLFW failed to create window");
 		return 1;
 	}
+
+#ifdef EMSCRIPTEN
+	//makes the canvas resizable and match the container
+	emscripten_glfw_make_canvas_resizable(window, "#canvas-container", nullptr);
+#endif
+	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	glfwSetWindowAttrib(window, GLFW_SCALE_FRAMEBUFFER, true);
+
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
@@ -367,8 +386,11 @@ int main() {
 
 	lightMesh = new ew::Mesh(ew::createSphere(0.3f, 12));
 
-
 	resetCamera(camera,cameraController);
+
+	int wWidth, wHeight;
+	glfwGetWindowSize(window, &wWidth, &wHeight);
+	framebufferSizeCallback(window, wWidth, wHeight);
 
 #ifdef EMSCRIPTEN
 	emscripten_set_main_loop(loop, 0, GLFW_FALSE);
@@ -386,9 +408,16 @@ int main() {
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-	glViewport(0, 0, width, height);
-	SCREEN_WIDTH = width;
-	SCREEN_HEIGHT = height;
+	double devicePixelRatio = 1;
+#ifdef EMSCRIPTEN
+	devicePixelRatio = emscripten_get_device_pixel_ratio();
+#endif
+
+	glViewport(0, 0, width * devicePixelRatio, height * devicePixelRatio);
+	SCREEN_WIDTH = width * devicePixelRatio;
+	SCREEN_HEIGHT = height * devicePixelRatio;
+
+	printf("Resize to %ix%i *%f\n", width, height, devicePixelRatio);
 }
 
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController) {
